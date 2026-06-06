@@ -1,0 +1,20 @@
+# Kimi (月之暗面) Provider Configuration
+# API 文档: https://platform.moonshot.cn/docs
+
+name = "Kimi (月之暗面)"
+base_url = "https://api.moonshot.cn/v1"
+env_key = "MOONSHOT_API_KEY"
+key_url = "https://platform.moonshot.cn/console/api-keys"
+default_model = "moonshot-v1-8k"
+
+[[models]]
+id = "moonshot-v1-8k"
+description = "Moonshot V1 8K 上下文"
+
+[[models]]
+id = "moonshot-v1-32k"
+description = "Moonshot V1 32K 上下文"
+
+[[models]]
+id = "moonshot-v1-128k"
+description = "Moonshot V1 128K 超长上下文"

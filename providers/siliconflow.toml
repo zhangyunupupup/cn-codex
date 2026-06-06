@@ -1,0 +1,20 @@
+# SiliconFlow Provider Configuration (多模型聚合)
+# API 文档: https://docs.siliconflow.cn/
+
+name = "SiliconFlow (多模型聚合)"
+base_url = "https://api.siliconflow.cn/v1"
+env_key = "SILICONFLOW_API_KEY"
+key_url = "https://cloud.siliconflow.cn/account/ak"
+default_model = "deepseek-ai/DeepSeek-V3"
+
+[[models]]
+id = "deepseek-ai/DeepSeek-V3"
+description = "DeepSeek V3 (通过 SiliconFlow)"
+
+[[models]]
+id = "deepseek-ai/DeepSeek-R1"
+description = "DeepSeek R1 推理模型 (通过 SiliconFlow)"
+
+[[models]]
+id = "Qwen/Qwen3-235B-A22B"
+description = "Qwen3 235B MoE (通过 SiliconFlow)"

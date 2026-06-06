@@ -1,0 +1,20 @@
+# DeepSeek Provider Configuration
+# API 文档: https://platform.deepseek.com/api-docs/
+
+name = "DeepSeek"
+base_url = "https://api.deepseek.com/v1"
+env_key = "DEEPSEEK_API_KEY"
+key_url = "https://platform.deepseek.com/api_keys"
+default_model = "deepseek-chat"
+
+[[models]]
+id = "deepseek-chat"
+description = "DeepSeek-V3 对话模型，通用编程首选"
+
+[[models]]
+id = "deepseek-reasoner"
+description = "DeepSeek-R1 推理模型，适合复杂逻辑"
+
+[[models]]
+id = "deepseek-coder"
+description = "DeepSeek-Coder 编程专用模型（如可用）"

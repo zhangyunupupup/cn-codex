@@ -1,0 +1,24 @@
+# 通义千问 (Qwen) Provider Configuration
+# API 文档: https://help.aliyun.com/zh/model-studio/
+
+name = "通义千问 (Qwen)"
+base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+env_key = "DASHSCOPE_API_KEY"
+key_url = "https://dashscope.console.aliyun.com/apiKey"
+default_model = "qwen-plus"
+
+[[models]]
+id = "qwen-plus"
+description = "通义千问 Plus，性价比高"
+
+[[models]]
+id = "qwen-turbo"
+description = "通义千问 Turbo，速度快"
+
+[[models]]
+id = "qwen-max"
+description = "通义千问 Max，能力最强"
+
+[[models]]
+id = "qwen-long"
+description = "通义千问 Long，超长上下文"

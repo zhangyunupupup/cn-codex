@@ -1,0 +1,15 @@
+# Rust
+bridge/target/
+**/*.rs.bk
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# cn-codex runtime
+.cn-codex/
+*.log

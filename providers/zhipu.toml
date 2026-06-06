@@ -1,0 +1,24 @@
+# 智谱 GLM Provider Configuration
+# API 文档: https://open.bigmodel.cn/dev/api
+
+name = "智谱 GLM"
+base_url = "https://open.bigmodel.cn/api/paas/v4"
+env_key = "ZHIPU_API_KEY"
+key_url = "https://open.bigmodel.cn/usercenter/apikeys"
+default_model = "glm-4-plus"
+
+[[models]]
+id = "glm-4-plus"
+description = "GLM-4 Plus，智能体编程首选"
+
+[[models]]
+id = "glm-4-flash"
+description = "GLM-4 Flash，速度快成本低"
+
+[[models]]
+id = "glm-4"
+description = "GLM-4 标准版"
+
+[[models]]
+id = "glm-4-long"
+description = "GLM-4 Long，超长上下文"
