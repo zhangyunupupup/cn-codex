@@ -14,11 +14,14 @@ cn-codex 在本地启动一个协议桥接代理，**自动将 Responses API 请
 
 ### 安装
 
+> **Windows 用户**：请在 **Git Bash** 或 **WSL** 中运行以下命令。
+> 不要直接双击 `.sh` 文件。
+
 ```bash
-# 一键安装
+# 方式一：一键安装（推荐）
 curl -fsSL https://raw.githubusercontent.com/zhangyunupupup/cn-codex/main/install.sh | bash
 
-# 或手动安装
+# 方式二：克隆后安装
 git clone https://github.com/zhangyunupupup/cn-codex.git
 cd cn-codex
 ./install.sh

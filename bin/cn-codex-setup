@@ -311,7 +311,7 @@ main() {
     echo ""
 
     read -rp "确认保存配置？[Y/n]: " confirm
-    if [[ "${confirm:-Y}" !~ ^[Yy] ]]; then
+    if [[ ! "${confirm:-Y}" =~ ^[Yy] ]]; then
         warn "已取消"
         exit 0
     fi
