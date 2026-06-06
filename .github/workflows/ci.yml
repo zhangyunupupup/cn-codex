@@ -76,6 +76,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Rust target
         run: rustup target add ${{ matrix.target }}
+      - name: Install cross-compilation tools (musl)
+        if: ${{ matrix.target == 'x86_64-unknown-linux-musl' }}
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
       - name: Build release
         working-directory: bridge
         run: cargo build --release --target ${{ matrix.target }}
