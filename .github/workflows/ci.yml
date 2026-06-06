@@ -82,11 +82,21 @@ jobs:
       - name: Build release
         working-directory: bridge
         run: cargo build --release --target ${{ matrix.target }}
+      - name: Prepare release binary
+        shell: bash
+        run: |
+          src="bridge/target/${{ matrix.target }}/release/cn-codex-bridge"
+          # Windows: rename .exe
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            src="${src}.exe"
+          fi
+          # Rename with platform prefix for unique asset names
+          cp "$src" "bridge/${{ matrix.artifact }}"
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: bridge/target/${{ matrix.target }}/release/cn-codex-bridge*
+          path: bridge/${{ matrix.artifact }}
           if-no-files-found: error
 
   # 创建 GitHub Release 并附上所有构建产物
