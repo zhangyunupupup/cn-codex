@@ -1,21 +1,56 @@
+<div align="center">
+
 # 🇨🇳 cn-codex
 
-> 让 OpenAI Codex CLI 开箱即用国产大模型
+让 OpenAI Codex CLI 开箱即用国产大模型
 
-cn-codex 是一个轻量工具，让 [OpenAI Codex CLI](https://github.com/openai/codex) 无缝接入 DeepSeek、通义千问、智谱 GLM、Kimi 等国产大模型。
+[![CI](https://img.shields.io/github/actions/workflow/status/zhangyunupupup/cn-codex/ci.yml?branch=main&label=CI&logo=github)](https://github.com/zhangyunupupup/cn-codex/actions)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Rust](https://img.shields.io/badge/Rust-1.80%2B-orange?logo=rust)](https://www.rust-lang.org)
+[![Version](https://img.shields.io/github/v/release/zhangyunupupup/cn-codex?label=version)](https://github.com/zhangyunupupup/cn-codex/releases)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-## 为什么需要 cn-codex？
+</div>
 
-Codex CLI 最新版（v0.123+）**仅支持 OpenAI Responses API**，而国产大模型普遍只提供 Chat Completions API。直接配置 `wire_api = "chat"` 已被硬删除，会报错。
+## 📋 目录
+
+- [为什么需要 cn-codex？](#-为什么需要-cn-codex)
+- [快速开始](#-快速开始)
+- [支持的模型](#-支持的模型)
+- [工作原理](#-工作原理)
+- [手动配置](#-手动配置)
+- [从源码编译](#-从源码编译)
+- [常见问题](#-常见问题)
+- [项目结构](#-项目结构)
+- [贡献](#-贡献)
+- [许可证](#-许可证)
+
+---
+
+## ❓ 为什么需要 cn-codex？
+
+Codex CLI 最新版（v0.123+）**仅支持 OpenAI Responses API**，而国产大模型（DeepSeek、Qwen、GLM 等）普遍只提供 Chat Completions API。直接配置 `wire_api = "chat"` 已被硬删除：
+
+```
+`wire_api = "chat"` is no longer supported.
+```
 
 cn-codex 在本地启动一个协议桥接代理，**自动将 Responses API 请求翻译为 Chat Completions 请求**，对 Codex 完全透明，无需任何代理网关或 Docker。
 
-## 快速开始
+---
+
+## 🚀 快速开始
+
+### 前置条件
+
+| 依赖 | 说明 | 安装方式 |
+|------|------|---------|
+| **Codex CLI** | OpenAI 编程代理 | `npm install -g @openai/codex` 或 `brew install codex` |
+| **Node.js / npm** | 安装 Codex CLI | 从 [nodejs.org](https://nodejs.org/) 下载 |
+
+> **Windows 用户**：请在 **Git Bash** 或 **WSL** 中运行以下命令，不要直接双击 `.sh` 文件。
 
 ### 安装
-
-> **Windows 用户**：请在 **Git Bash** 或 **WSL** 中运行以下命令。
-> 不要直接双击 `.sh` 文件。
 
 ```bash
 # 方式一：一键安装（推荐）
@@ -45,21 +80,28 @@ cn-codex "帮我写个 Python 快速排序"
 cn-codex bridge status    # 查看状态
 cn-codex bridge restart  # 重启代理
 cn-codex bridge log      # 查看日志
+
+# 先启动桥接代理，再单独使用 codex 命令
+codex "继续未完成的任务"
 ```
 
-## 支持的模型
+---
 
-| 提供商 | 默认模型 | API Key 获取 |
-|--------|---------|-------------|
-| **DeepSeek** | deepseek-chat | [获取 Key](https://platform.deepseek.com/api_keys) |
-| **通义千问 (Qwen)** | qwen-plus | [获取 Key](https://dashscope.console.aliyun.com/apiKey) |
-| **智谱 GLM** | glm-4-plus | [获取 Key](https://open.bigmodel.cn/usercenter/apikeys) |
-| **Kimi (月之暗面)** | moonshot-v1-8k | [获取 Key](https://platform.moonshot.cn/console/api-keys) |
-| **豆包 (字节跳动)** | doubao-pro-32k | [获取 Key](https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey) |
-| **SiliconFlow** | DeepSeek-V3 | [获取 Key](https://cloud.siliconflow.cn/account/ak) |
-| 自定义 API | — | — |
+## 🧠 支持的模型
 
-## 工作原理
+| 提供商 | Provider ID | 默认模型 | API Key 获取 |
+|--------|-----------|---------|-------------|
+| **DeepSeek** | `deepseek` | deepseek-chat | [获取 Key](https://platform.deepseek.com/api_keys) |
+| **通义千问 (Qwen)** | `qwen` | qwen-plus | [获取 Key](https://dashscope.console.aliyun.com/apiKey) |
+| **智谱 GLM** | `zhipu` | glm-4-plus | [获取 Key](https://open.bigmodel.cn/usercenter/apikeys) |
+| **Kimi (月之暗面)** | `kimi` | moonshot-v1-8k | [获取 Key](https://platform.moonshot.cn/console/api-keys) |
+| **豆包 (字节跳动)** | `doubao` | doubao-pro-32k | [获取 Key](https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey) |
+| **SiliconFlow** | `siliconflow` | DeepSeek-V3 | [获取 Key](https://cloud.siliconflow.cn/account/ak) |
+| 自定义 API | — | — | 你自己的 API |
+
+---
+
+## 🔧 工作原理
 
 ```
 ┌─────────────┐    Responses API    ┌──────────────────┐   Chat Completions   ┌──────────────┐
@@ -79,11 +121,13 @@ cn-codex bridge log      # 查看日志
 
 | 方向 | 转换内容 |
 |------|---------|
-| Request | `input[]` → `messages[]`，`instructions` → `system` message，`function` tools → Chat tools |
-| Response | `choices[].message` → `output[]` items，`tool_calls` → `function_call` items |
-| Stream | Chat SSE `delta.content` → Responses `output_text.delta`，`delta.tool_calls` → `function_call_arguments.delta` |
+| 请求 | `input[]` → `messages[]`，`instructions` → `system` message，`function` tools → Chat tools |
+| 响应 | `choices[].message` → `output[]` items，`tool_calls` → `function_call` items |
+| 流式 | Chat SSE `delta.content` → Responses `output_text.delta`，`delta.tool_calls` → `function_call_arguments.delta` |
 
-## 手动配置
+---
+
+## ⚙️ 手动配置
 
 如果你不想用 `cn-codex-setup`，可以手动配置：
 
@@ -109,7 +153,10 @@ stream_idle_timeout_ms = 600000
 ### 3. 启动桥接代理
 
 ```bash
-cn-codex-bridge --port 15721 --upstream-url https://api.deepseek.com/v1 --api-key-env DEEPSEEK_API_KEY
+cn-codex-bridge \
+  --port 15721 \
+  --upstream-url https://api.deepseek.com/v1 \
+  --api-key-env DEEPSEEK_API_KEY
 ```
 
 ### 4. 运行 Codex
@@ -118,24 +165,28 @@ cn-codex-bridge --port 15721 --upstream-url https://api.deepseek.com/v1 --api-ke
 codex "你的任务"
 ```
 
-## 从源码编译
+---
+
+## 🏗️ 从源码编译
 
 ```bash
-# 需要 Rust 工具链
+# 需要 Rust 工具链 (https://rustup.rs)
 git clone https://github.com/zhangyunupupup/cn-codex.git
 cd cn-codex/bridge
 cargo build --release
 
-# 二进制位于 target/release/cn-codex-bridge
+# 二进制位于 target/release/cn-codex-bridge (约 4.9MB)
 cp target/release/cn-codex-bridge ~/.cn-codex/bin/
 ```
 
-## 常见问题
+---
+
+## ❔ 常见问题
 
 <details>
 <summary><b>为什么不用 wire_api = "chat" 直接配？</b></summary>
 
-Codex CLI v0.123+ 已硬删除 `wire_api = "chat"` 支持（PR #10157），配置后会报错：
+Codex CLI v0.123+ 已硬删除 `wire_api = "chat"` 支持（[PR #10157](https://github.com/openai/codex/pull/10157)），配置后会报错：
 ```
 `wire_api = "chat"` is no longer supported.
 ```
@@ -171,7 +222,11 @@ cn-codex 通过本地协议桥接绕过了这个限制。
 ✅ 支持。DeepSeek R1 返回的 `reasoning_content` 会被转换为 Responses API 的 `reasoning` 事件。
 </details>
 
-## 项目结构
+更多问题请查看 [FAQ](docs/faq.md)。
+
+---
+
+## 📁 项目结构
 
 ```
 cn-codex/
@@ -184,7 +239,7 @@ cn-codex/
 │   └── src/
 │       ├── main.rs       # 入口
 │       ├── config.rs     # 配置
-│       ├── converter.rs  # 协议转换核心
+│       ├── converter.rs  # 协议转换核心 (含4个单元测试)
 │       ├── proxy.rs      # HTTP 代理层
 │       └── server.rs     # HTTP 服务器
 ├── providers/            # 预置国产模型配置 (TOML)
@@ -194,24 +249,36 @@ cn-codex/
 │   ├── kimi.toml
 │   ├── doubao.toml
 │   └── siliconflow.toml
-└── docs/
-    └── faq.md
+├── docs/
+│   └── faq.md
+├── .github/
+│   └── workflows/
+│       └── ci.yml        # CI/CD: 编译+测试+跨平台发布
+├── CONTRIBUTING.md        # 贡献指南
+├── CHANGELOG.md           # 变更日志
+└── LICENSE                # Apache-2.0
 ```
 
-## 贡献
+---
 
-欢迎贡献！特别需要：
+## 🤝 贡献
+
+欢迎贡献！详见 [CONTRIBUTING.md](CONTRIBUTING.md)。特别需要：
 
 - 更多国产模型 provider 配置
 - 桥接代理功能增强（更多 Responses API 特性支持）
 - 文档和测试
 - Windows 适配
 
-## 许可证
+---
 
-Apache-2.0
+## 📄 许可证
 
-## 致谢
+[Apache-2.0](LICENSE) — 详见项目 LICENSE 文件。
+
+---
+
+## 🙏 致谢
 
 - [OpenAI Codex CLI](https://github.com/openai/codex) — 上游项目
 - [va-ai-api-bridge](https://github.com/jazzenchen/va-ai-api-bridge) — 协议转换设计参考
