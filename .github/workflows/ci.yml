@@ -62,9 +62,6 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
             artifact: cn-codex-bridge-linux-x86_64
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-musl
-            artifact: cn-codex-bridge-linux-aarch64
           - os: macos-latest
             target: x86_64-apple-darwin
             artifact: cn-codex-bridge-macos-x86_64
@@ -81,8 +78,55 @@ jobs:
       - name: Build release
         working-directory: bridge
         run: cargo build --release --target ${{ matrix.target }}
-      - name: Upload artifact
+      - name: Upload release artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
           path: bridge/target/${{ matrix.target }}/release/cn-codex-bridge*
+          if-no-files-found: error
+
+  # 创建 GitHub Release 并附上所有构建产物
+  create-release:
+    needs: release
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: List artifacts
+        run: ls -la artifacts/*/
+      - name: Generate release notes
+        run: |
+          cat > release-notes.md << 'EOF'
+          # cn-codex v${{ github.ref_name }}
+
+          让 OpenAI Codex CLI 开箱即用国产大模型。
+
+          ## 安装
+
+          ```bash
+          curl -fsSL https://raw.githubusercontent.com/zhangyunupupup/cn-codex/main/install.sh | bash
+          ```
+
+          详情请查看 [README](https://github.com/zhangyunupupup/cn-codex#readme)。
+
+          ## 下载
+
+          根据你的平台下载对应二进制：
+          EOF
+          echo "" >> release-notes.md
+          for dir in artifacts/*/; do
+            name=$(basename "$dir")
+            echo "- \`${name}\`" >> release-notes.md
+          done
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: cn-codex ${{ github.ref_name }}
+          body_path: release-notes.md
+          files: artifacts/*/*
