@@ -16,10 +16,10 @@ cn-codex 在本地启动一个协议桥接代理，**自动将 Responses API 请
 
 ```bash
 # 一键安装
-curl -fsSL https://raw.githubusercontent.com/用户名/cn-codex/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/zhangyunupupup/cn-codex/main/install.sh | bash
 
 # 或手动安装
-git clone https://github.com/用户名/cn-codex.git
+git clone https://github.com/zhangyunupupup/cn-codex.git
 cd cn-codex
 ./install.sh
 ```
@@ -119,7 +119,7 @@ codex "你的任务"
 
 ```bash
 # 需要 Rust 工具链
-git clone https://github.com/用户名/cn-codex.git
+git clone https://github.com/zhangyunupupup/cn-codex.git
 cd cn-codex/bridge
 cargo build --release
 

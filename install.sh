@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # cn-codex 一键安装脚本
-# 用法: curl -fsSL https://raw.githubusercontent.com/用户名/cn-codex/main/install.sh | bash
+# 用法: curl -fsSL https://raw.githubusercontent.com/zhangyunupupup/cn-codex/main/install.sh | bash
 
 set -euo pipefail
 
 # === 常量 ===
 CN_CODEX_HOME="${CN_CODEX_HOME:-$HOME/.cn-codex}"
 CN_CODEX_VERSION="0.1.0"
-REPO_BASE="https://raw.githubusercontent.com/用户名/cn-codex/main"
+REPO_BASE="https://raw.githubusercontent.com/zhangyunupupup/cn-codex/main"
 
 # === 颜色 ===
 RED='\033[0;31m'
@@ -89,7 +89,7 @@ install_bridge() {
         ext=".exe"
     fi
 
-    local download_url="https://github.com/用户名/cn-codex/releases/download/v${CN_CODEX_VERSION}/cn-codex-bridge-${platform}${ext}"
+    local download_url="https://github.com/zhangyunupupup/cn-codex/releases/download/v${CN_CODEX_VERSION}/cn-codex-bridge-${platform}${ext}"
 
     info "正在下载桥接代理..."
     if command -v curl &>/dev/null; then
@@ -126,7 +126,7 @@ install_bridge_from_source() {
     trap "rm -rf '$tmp_dir'" EXIT
 
     # Clone 最小代码
-    git clone --depth 1 https://github.com/用户名/cn-codex.git "$tmp_dir/cn-codex" 2>/dev/null || {
+    git clone --depth 1 https://github.com/zhangyunupupup/cn-codex.git "$tmp_dir/cn-codex" 2>/dev/null || {
         error "无法克隆仓库，请检查网络连接"
         return 1
     }
