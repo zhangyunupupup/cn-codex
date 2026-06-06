@@ -5,8 +5,37 @@
 #   curl -fsSL https://raw.githubusercontent.com/zhangyunupupup/cn-codex/main/install.sh | bash
 #   # 或下载后: bash install.sh
 #
-# 注意: 本脚本为 Linux/macOS 设计。
-#       Windows 用户请使用 Git Bash / WSL 运行。
+# 注意: ❌ 不要双击运行！必须在终端中执行！
+#       Windows: 打开 Git Bash → 输入 bash install.sh
+#       Mac/Linux: 打开终端 → 输入 bash install.sh
+
+# === 双击检测（Windows Git Bash 双击会闪退，提前拦截）===
+detect_double_click() {
+    # 仅在 Windows Git Bash (MINGW/MSYS/CYGWIN) 下检测
+    case "$(uname -s 2>/dev/null)" in
+        MINGW*|MSYS*|CYGWIN*)
+            # 双击运行时 stdin 不是终端（TTY）
+            if [[ ! -t 0 ]]; then
+                echo ""
+                echo "===================================================="
+                echo "  ⚠️  检测到双击运行！"
+                echo ""
+                echo "  请勿双击 .sh 文件运行！"
+                echo ""
+                echo "  正确方式：打开 Git Bash 终端，输入："
+                echo ""
+                echo "    cd 文件所在目录"
+                echo "    bash install.sh"
+                echo ""
+                echo "  此窗口将在 10 秒后自动关闭..."
+                echo "===================================================="
+                sleep 10
+                exit 1
+            fi
+            ;;
+    esac
+}
+detect_double_click
 
 # 不使用 set -e，改为手动错误处理，避免无声闪退
 set -uo pipefail

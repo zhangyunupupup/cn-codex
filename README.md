@@ -48,7 +48,12 @@ cn-codex 在本地启动一个协议桥接代理，**自动将 Responses API 请
 | **Codex CLI** | OpenAI 编程代理 | `npm install -g @openai/codex` 或 `brew install codex` |
 | **Node.js / npm** | 安装 Codex CLI | 从 [nodejs.org](https://nodejs.org/) 下载 |
 
-> **Windows 用户**：请在 **Git Bash** 或 **WSL** 中运行以下命令，不要直接双击 `.sh` 文件。
+> **⛔ Windows 用户请注意：不要双击 .sh 文件！**
+> 正确操作：打开 **Git Bash**（或 **WSL**），在终端中输入：
+> ```bash
+> cd 下载目录
+> bash install.sh
+> ```
 
 ### 安装
 
