@@ -14,6 +14,7 @@ pub struct BridgeConfig {
 }
 
 /// Provider configuration file format (TOML)
+#[allow(dead_code)]
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ProviderConfig {
     pub name: String,
@@ -24,6 +25,7 @@ pub struct ProviderConfig {
     pub default_model: Option<String>,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ModelEntry {
     pub id: String,
@@ -39,6 +41,7 @@ impl BridgeConfig {
     }
 
     /// Get the upstream models endpoint URL
+    #[allow(dead_code)]
     pub fn models_url(&self) -> String {
         let base = self.upstream_url.trim_end_matches('/');
         format!("{}/models", base)

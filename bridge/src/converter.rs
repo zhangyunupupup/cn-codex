@@ -15,7 +15,7 @@ use std::collections::HashMap;
 pub fn responses_to_chat_request(responses_body: &Value) -> Result<Value, ConverterError> {
     let model = responses_body["model"]
         .as_str()
-        .ok_or_else(|| ConverterError::MissingField("model"))?;
+        .ok_or(ConverterError::MissingField("model"))?;
 
     let input = &responses_body["input"];
     let instructions = responses_body["instructions"].as_str().unwrap_or("");
@@ -214,7 +214,7 @@ pub fn chat_to_responses_response(
 
     let choices = chat_response["choices"]
         .as_array()
-        .ok_or_else(|| ConverterError::MissingField("choices"))?;
+        .ok_or(ConverterError::MissingField("choices"))?;
 
     let mut output = Vec::new();
 
@@ -311,8 +311,7 @@ impl StreamConverter {
             if let Some(content) = delta["content"].as_str() {
                 if !content.is_empty() {
                     if self.output_index == 0
-                        || (self.current_tool_calls.is_empty()
-                            && self.output_index <= 1)
+                        || (self.current_tool_calls.is_empty() && self.output_index <= 1)
                     {
                         // First text: emit output_item.added
                         if self.output_index == 0 {
@@ -327,24 +326,19 @@ impl StreamConverter {
             // Tool call deltas
             if let Some(tool_calls) = delta["tool_calls"].as_array() {
                 for tc in tool_calls {
-                    let idx = tc["index"]
-                        .as_u64()
-                        .unwrap_or(0) as usize;
+                    let idx = tc["index"].as_u64().unwrap_or(0) as usize;
 
-                    let tc_state = self
-                        .current_tool_calls
-                        .entry(idx)
-                        .or_insert_with(|| ToolCallState {
-                            id: tc["id"]
-                                .as_str()
-                                .unwrap_or(&format!("call_{}", idx))
-                                .to_string(),
-                            name: tc["function"]["name"]
-                                .as_str()
-                                .unwrap_or("")
-                                .to_string(),
-                            arguments: String::new(),
-                        });
+                    let tc_state =
+                        self.current_tool_calls
+                            .entry(idx)
+                            .or_insert_with(|| ToolCallState {
+                                id: tc["id"]
+                                    .as_str()
+                                    .unwrap_or(&format!("call_{}", idx))
+                                    .to_string(),
+                                name: tc["function"]["name"].as_str().unwrap_or("").to_string(),
+                                arguments: String::new(),
+                            });
 
                     // Append function arguments delta
                     if let Some(args_delta) = tc["function"]["arguments"].as_str() {
@@ -367,7 +361,7 @@ impl StreamConverter {
             // Finish reason
             if !finish_reason.is_empty() && finish_reason != "null" {
                 // Complete any pending tool calls
-                for (idx, tc_state) in &self.current_tool_calls {
+                for tc_state in self.current_tool_calls.values() {
                     events.push(self.make_function_call_done_event(
                         &tc_state.id,
                         &tc_state.name,
@@ -417,6 +411,7 @@ impl StreamConverter {
         })
     }
 
+    #[allow(dead_code)]
     fn make_function_call_delta_event(&self, call_id: &str, args_delta: &str) -> Value {
         json!({
             "type": "response.function_call_arguments.delta",
@@ -425,12 +420,7 @@ impl StreamConverter {
         })
     }
 
-    fn make_function_call_done_event(
-        &self,
-        call_id: &str,
-        name: &str,
-        arguments: &str,
-    ) -> Value {
+    fn make_function_call_done_event(&self, call_id: &str, name: &str, arguments: &str) -> Value {
         json!({
             "type": "response.output_item.done",
             "output_index": self.output_index,
@@ -479,6 +469,7 @@ fn uuid_short() -> String {
 pub enum ConverterError {
     #[error("Missing required field: {0}")]
     MissingField(&'static str),
+    #[allow(dead_code)]
     #[error("Invalid format: {0}")]
     InvalidFormat(String),
     #[error("JSON error: {0}")]

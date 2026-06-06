@@ -4,7 +4,6 @@ use crate::config::BridgeConfig;
 use reqwest::Client;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tracing::info;
 
 /// Shared state for the proxy
 pub struct ProxyState {

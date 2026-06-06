@@ -14,7 +14,11 @@ use tracing::level_filters::LevelFilter;
 use tracing_subscriber::EnvFilter;
 
 #[derive(Parser, Debug)]
-#[command(name = "cn-codex-bridge", version, about = "Local API bridge for Chinese LLM providers")]
+#[command(
+    name = "cn-codex-bridge",
+    version,
+    about = "Local API bridge for Chinese LLM providers"
+)]
 struct Args {
     /// Port to listen on
     #[arg(long, default_value = "15721")]
@@ -41,9 +45,7 @@ async fn main() {
     let filter = EnvFilter::builder()
         .with_default_directive(LevelFilter::INFO.into())
         .parse_lossy(&args.log_level);
-    tracing_subscriber::fmt()
-        .with_env_filter(filter)
-        .init();
+    tracing_subscriber::fmt().with_env_filter(filter).init();
 
     // Read API key from environment
     let api_key = std::env::var(&args.api_key_env).unwrap_or_else(|_| {

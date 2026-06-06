@@ -4,13 +4,12 @@ use crate::config::BridgeConfig;
 use crate::converter;
 use crate::proxy::{ProxyState, SharedProxyState};
 use axum::{
-    Router,
     body::Body,
     extract::State,
     http::{HeaderMap, HeaderValue, StatusCode},
     response::IntoResponse,
     routing::{get, post},
-    Json,
+    Json, Router,
 };
 use futures::StreamExt;
 use serde_json::{json, Value};
@@ -122,8 +121,9 @@ async fn handle_responses(
         info!("Starting streaming response conversion");
 
         let (tx, rx) = tokio::sync::mpsc::channel::<Result<String, std::io::Error>>(100);
-        let stream_converter =
-            Arc::new(tokio::sync::Mutex::new(converter::StreamConverter::new(model)));
+        let stream_converter = Arc::new(tokio::sync::Mutex::new(converter::StreamConverter::new(
+            model,
+        )));
 
         // Spawn background task to process the stream
         tokio::spawn(async move {
@@ -149,9 +149,7 @@ async fn handle_responses(
                                         "type": "response.completed",
                                         "response": { "status": "completed" }
                                     });
-                                    let _ = tx
-                                        .send(Ok(format_sse_line(&done_event)))
-                                        .await;
+                                    let _ = tx.send(Ok(format_sse_line(&done_event))).await;
                                     return;
                                 }
 
@@ -180,14 +178,16 @@ async fn handle_responses(
         });
 
         // Convert mpsc receiver to axum body stream
-        let body_stream = tokio_stream::wrappers::ReceiverStream::new(rx).map(|result| {
-            result.map(|s| bytes::Bytes::from(s))
-        });
+        let body_stream = tokio_stream::wrappers::ReceiverStream::new(rx)
+            .map(|result| result.map(bytes::Bytes::from));
 
         let body = Body::from_stream(body_stream);
 
         let mut headers = HeaderMap::new();
-        headers.insert("Content-Type", HeaderValue::from_static("text/event-stream"));
+        headers.insert(
+            "Content-Type",
+            HeaderValue::from_static("text/event-stream"),
+        );
         headers.insert("Cache-Control", HeaderValue::from_static("no-cache"));
         headers.insert("Connection", HeaderValue::from_static("keep-alive"));
 
@@ -207,7 +207,10 @@ async fn handle_responses(
             Ok(r) => r,
             Err(e) => {
                 error!("Response conversion error: {}", e);
-                return (StatusCode::INTERNAL_SERVER_ERROR, "Response conversion error")
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Response conversion error",
+                )
                     .into_response();
             }
         };
